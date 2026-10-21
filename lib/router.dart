@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 
+import 'screens/add_task_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/task_detail_screen.dart';
 import 'task.dart';
 
 /// Part 1: the app's routes.
@@ -17,6 +19,19 @@ GoRouter createRouter(TaskStore store) {
         path: '/',
         builder: (context, state) => HomeScreen(store: store),
         // TODO(1.1, 1.2): add routes: [ GoRoute(path: 'add', ...), GoRoute(path: 'task/:id', ...) ]
+        routes: [
+          GoRoute(
+            path: 'add',
+            builder: (context, state) => const AddTaskScreen(),
+          ),
+          GoRoute(
+            path: 'task/:id',
+            builder: (context, state) {
+              final id = int.parse(state.pathParameters['id']!);
+              return TaskDetailScreen(store: store, id: id);
+            },
+          ),
+        ],
       ),
     ],
   );
