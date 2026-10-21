@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../task.dart';
 
@@ -17,12 +18,22 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO(2.3): open '/add' with context.push<(String, String)>('/add').
     // The form returns (title, course) when the user saves, or null.
     // If not null: setState(() => widget.store.add(...)).
+    final result = await context.push<(String, String)>('/add');
+    if (result != null && mounted) {
+      setState(() {
+        widget.store.add(result.$1, result.$2);
+      });
+    }
   }
 
   // ignore: unused_element (you will call it in TODO 2.1)
   Future<void> _openTask(Task task) async {
     // TODO(4.1): open '/task/<id>' with context.push, then call setState(() {})
     // afterwards (the task may have been deleted on the detail screen).
+    await context.push('/task/${task.id}');
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -33,7 +44,19 @@ class _HomeScreenState extends State<HomeScreen> {
       // TODO(2.1): if tasks is empty show Center(Text('No tasks yet')),
       // otherwise a ListView.builder with one ListTile per task
       // (title: task.title, subtitle: task.course, onTap: () => _openTask(task)).
-      body: Center(child: Text('${tasks.length} tasks - TODO: show the list')),
+      body: tasks.isEmpty
+          ? const Center(child: Text('No tasks yet'))
+          : ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                final task = tasks[index];
+                return ListTile(
+                  title: Text(task.title),
+                  subtitle: Text(task.course),
+                  onTap: () => _openTask(task),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Add task',
         onPressed: _addTask, // TODO(2.3) is inside _addTask
